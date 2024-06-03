@@ -1,31 +1,22 @@
-'use client'
+// getServerSideProps(page router) -> server components(app router)
+// 迁移文档：https://nextjs.org/docs/app/building-your-application/upgrading/app-router-migration#server-side-rendering-getserversideprops
+async function getTodos() {
+  const res = await fetch(`https://jsonplaceholder.typicode.com/todos`, { cache: 'no-store' })
+  const todos = await res.json()
 
-import { useEffect, useState } from 'react'
+  return todos
+}
 
-export default function Page() {
-  const [data, setData] = useState(null)
-  const [error, setError] = useState(null)
+export default async function Page() {
+  const todos = await getTodos()
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch('https://jsonplaceholder.typicode.com/todos/1')
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        const result = await response.json()
-        setData(result)
-      } catch (e) {
-        setError(e.message)
-      }
-    }
-
-    fetchData()
-  }, [])
-
-  if (error) {
-    return <p>Error: {error}</p>
-  }
-
-  return <p>{data ? `Your data: ${JSON.stringify(data)}` : 'Loading...'}</p>
+  return (
+    <ul>
+      {todos.map((todo) => (
+        <li key={todo.id}>
+          {todo.id}:{todo.title}
+        </li>
+      ))}
+    </ul>
+  )
 }
